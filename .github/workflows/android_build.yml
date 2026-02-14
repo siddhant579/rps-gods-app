@@ -14,34 +14,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Ionic and Capacitor
-        run: npm install -g @ionic/cli @capacitor/core @capacitor/cli
-
-      - name: Create Web Project
-        run: |
-          mkdir www
-          cp index.html www/
-          npx cap init "RPS GODS" com.rps.gods --web-dir www
-          npx cap add android
-
-      - name: Build Android Release
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleRelease # APK banayega
-          ./gradlew bundleRelease   # AAB banayega
+      - name: Build Android App
+        uses: jmatsu/build-android-app-action@v1
+        with:
+          project-root: .
+          # Ye action aapki index.html ko ek basic webview mein wrap kar dega
+          # Bina bade frameworks ke load ke
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Game-APK
-          path: android/app/build/outputs/apk/release/*.apk
+          path: ./**/*.apk
 
       - name: Upload AAB (Play Store)
         uses: actions/upload-artifact@v4
         with:
           name: Game-AAB
-          path: android/app/build/outputs/bundle/release/*.aab
+          path: ./**/*.aab
