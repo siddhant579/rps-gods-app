@@ -17,21 +17,28 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build APK (Webview)
+      - name: Create Webview Project
         run: |
-          # Is baar hum kisi framework ka wait nahi karenge
-          # Hum seedha ek lightweight Android project structure banayenge
+          # Bina bade framework ke seedha folder structure banana
           mkdir -p app/src/main/assets
           cp index.html app/src/main/assets/
           
-          # Basic Gradle build command (Ye fast hota hai)
-          chmod +x gradlew
-          ./gradlew assembleRelease
+          # Basic placeholder file build ke liye
+          echo "Building APK and AAB..."
 
-      - name: Upload Files
+      - name: Build with Gradle Action
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleRelease bundleRelease
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: RPS-Gods-App
-          path: |
-            **/build/outputs/apk/release/*.apk
-            **/build/outputs/bundle/release/*.aab
+          name: Game-APK
+          path: "**/*.apk"
+
+      - name: Upload AAB (Play Store)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Game-AAB
+          path: "**/*.aab"
