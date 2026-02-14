@@ -1,0 +1,48 @@
+name: Build Android App
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Cordova
+        run: npm install -g cordova
+
+      - name: Create Android Project
+        run: |
+          cordova create rps_app com.rps.gods "RPS GODS"
+          cd rps_app
+          cordova platform add android
+          rm -rf www/*
+          cp ../index.html www/
+          
+      - name: Build APK (Offline Ready)
+        run: |
+          cd rps_app
+          cordova build android --release -- --packageType=apk
+
+      - name: Build AAB (For Play Store)
+        run: |
+          cd rps_app
+          cordova build android --release -- --packageType=bundle
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: Game-APK
+          path: rps_app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Upload AAB (Play Store File)
+        uses: actions/upload-artifact@v3
+        with:
+          name: Game-AAB
+          path: rps_app/platforms/android/app/build/outputs/bundle/release/app-release.aab
+          
