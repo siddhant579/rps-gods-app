@@ -14,21 +14,24 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build Android App
-        uses: jmatsu/build-android-app-action@v1
-        with:
-          project-root: .
-          # Ye action aapki index.html ko ek basic webview mein wrap kar dega
-          # Bina bade frameworks ke load ke
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Upload APK
+      - name: Build APK (Webview)
+        run: |
+          # Is baar hum kisi framework ka wait nahi karenge
+          # Hum seedha ek lightweight Android project structure banayenge
+          mkdir -p app/src/main/assets
+          cp index.html app/src/main/assets/
+          
+          # Basic Gradle build command (Ye fast hota hai)
+          chmod +x gradlew
+          ./gradlew assembleRelease
+
+      - name: Upload Files
         uses: actions/upload-artifact@v4
         with:
-          name: Game-APK
-          path: ./**/*.apk
-
-      - name: Upload AAB (Play Store)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Game-AAB
-          path: ./**/*.aab
+          name: RPS-Gods-App
+          path: |
+            **/build/outputs/apk/release/*.apk
+            **/build/outputs/bundle/release/*.aab
